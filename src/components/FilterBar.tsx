@@ -1,61 +1,102 @@
-import type React from "react"
-import { memo } from "react"
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native"
-import { Feather } from "@expo/vector-icons"
+import type React from "react";
+import { memo } from "react";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { Feather } from "@expo/vector-icons";
 
-type FilterType = "all" | "active" | "completed"
-type SortType = "date" | "priority" | "dueDate"
+type FilterType = "all" | "active" | "completed";
+type SortType = "date" | "priority" | "dueDate";
 
 type FilterBarProps = {
-  filter: FilterType
-  setFilter: (filter: FilterType) => void
-  sortBy: SortType
-  setSortBy: (sortBy: SortType) => void
-}
+  filter: FilterType;
+  setFilter: (filter: FilterType) => void;
+  sortBy: SortType;
+  setSortBy: (sortBy: SortType) => void;
+};
 
 // Using memo to prevent unnecessary re-renders
-const FilterBar: React.FC<FilterBarProps> = memo(({ filter, setFilter, sortBy, setSortBy }) => {
-  return (
-    <View style={styles.container}>
-      <View style={styles.filterContainer}>
-        <TouchableOpacity
-          style={[styles.filterButton, filter === "all" && styles.activeFilter]}
-          onPress={() => setFilter("all")}
-        >
-          <Text style={[styles.filterText, filter === "all" && styles.activeFilterText]}>All</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.filterButton, filter === "active" && styles.activeFilter]}
-          onPress={() => setFilter("active")}
-        >
-          <Text style={[styles.filterText, filter === "active" && styles.activeFilterText]}>Active</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.filterButton, filter === "completed" && styles.activeFilter]}
-          onPress={() => setFilter("completed")}
-        >
-          <Text style={[styles.filterText, filter === "completed" && styles.activeFilterText]}>Completed</Text>
-        </TouchableOpacity>
-      </View>
+const FilterBar: React.FC<FilterBarProps> = memo(
+  ({ filter, setFilter, sortBy, setSortBy }) => {
+    return (
+      <View style={styles.container}>
+        <View style={styles.filterContainer}>
+          <TouchableOpacity
+            style={[
+              styles.filterButton,
+              filter === "all" && styles.activeFilter,
+            ]}
+            onPress={() => setFilter("all")}
+          >
+            <Text
+              style={[
+                styles.filterText,
+                filter === "all" && styles.activeFilterText,
+              ]}
+            >
+              전체
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.filterButton,
+              filter === "active" && styles.activeFilter,
+            ]}
+            onPress={() => setFilter("active")}
+          >
+            <Text
+              style={[
+                styles.filterText,
+                filter === "active" && styles.activeFilterText,
+              ]}
+            >
+              진행중
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.filterButton,
+              filter === "completed" && styles.activeFilter,
+            ]}
+            onPress={() => setFilter("completed")}
+          >
+            <Text
+              style={[
+                styles.filterText,
+                filter === "completed" && styles.activeFilterText,
+              ]}
+            >
+              완료됨
+            </Text>
+          </TouchableOpacity>
+        </View>
 
-      <View style={styles.sortContainer}>
-        <Text style={styles.sortLabel}>Sort by:</Text>
-        <TouchableOpacity
-          style={styles.sortButton}
-          onPress={() => {
-            const nextSort: SortType = sortBy === "date" ? "priority" : sortBy === "priority" ? "dueDate" : "date"
-            setSortBy(nextSort)
-          }}
-        >
-          <Text style={styles.sortText}>
-            {sortBy === "date" ? "Date Created" : sortBy === "priority" ? "Priority" : "Due Date"}
-          </Text>
-          <Feather name="chevron-down" size={16} color="#757575" />
-        </TouchableOpacity>
+        <View style={styles.sortContainer}>
+          <Text style={styles.sortLabel}>정렬:</Text>
+          <TouchableOpacity
+            style={styles.sortButton}
+            onPress={() => {
+              const nextSort: SortType =
+                sortBy === "date"
+                  ? "priority"
+                  : sortBy === "priority"
+                  ? "dueDate"
+                  : "date";
+              setSortBy(nextSort);
+            }}
+          >
+            <Text style={styles.sortText}>
+              {sortBy === "date"
+                ? "생성일"
+                : sortBy === "priority"
+                ? "우선순위"
+                : "마감일"}
+            </Text>
+            <Feather name="chevron-down" size={16} color="#757575" />
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
-  )
-})
+    );
+  }
+);
 
 const styles = StyleSheet.create({
   container: {
@@ -108,6 +149,6 @@ const styles = StyleSheet.create({
     color: "#2196F3",
     marginRight: 4,
   },
-})
+});
 
-export default FilterBar
+export default FilterBar;

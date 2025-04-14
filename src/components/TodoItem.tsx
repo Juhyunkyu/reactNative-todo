@@ -1,34 +1,37 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useContext, memo } from "react"
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native"
-import { useNavigation } from "@react-navigation/native"
-import type { NativeStackNavigationProp } from "@react-navigation/native-stack"
-import { Feather } from "@expo/vector-icons"
-import { Swipeable } from "react-native-gesture-handler"
-import { TodoContext } from "../context/TodoContext"
-import type { RootStackParamList, Todo } from "../types"
-import { formatDate } from "../utils/dateUtils"
+import type React from "react";
+import { useContext, memo } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { Feather } from "@expo/vector-icons";
+import { Swipeable } from "react-native-gesture-handler";
+import { TodoContext } from "../context/TodoContext";
+import type { RootStackParamList, Todo } from "../types";
+import { formatDate } from "../utils/dateUtils";
 
 type TodoItemProps = {
-  todo: Todo
-}
+  todo: Todo;
+};
 
-type TodoItemNavigationProp = NativeStackNavigationProp<RootStackParamList, "Home">
+type TodoItemNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "Home"
+>;
 
 // Using memo to prevent unnecessary re-renders
 const TodoItem: React.FC<TodoItemProps> = memo(({ todo }) => {
-  const { toggleTodoStatus, deleteTodo } = useContext(TodoContext)
-  const navigation = useNavigation<TodoItemNavigationProp>()
+  const { toggleTodoStatus, deleteTodo } = useContext(TodoContext);
+  const navigation = useNavigation<TodoItemNavigationProp>();
 
   const handleToggleStatus = () => {
-    toggleTodoStatus(todo.id)
-  }
+    toggleTodoStatus(todo.id);
+  };
 
   const handleEdit = () => {
-    navigation.navigate("AddEditTodo", { todo })
-  }
+    navigation.navigate("AddEditTodo", { todo });
+  };
 
   const handleDelete = () => {
     Alert.alert("Delete Todo", "Are you sure you want to delete this todo?", [
@@ -38,39 +41,47 @@ const TodoItem: React.FC<TodoItemProps> = memo(({ todo }) => {
         onPress: () => deleteTodo(todo.id),
         style: "destructive",
       },
-    ])
-  }
+    ]);
+  };
 
   const renderRightActions = () => {
     return (
       <View style={styles.rightActions}>
-        <TouchableOpacity style={[styles.actionButton, styles.editButton]} onPress={handleEdit}>
+        <TouchableOpacity
+          style={[styles.actionButton, styles.editButton]}
+          onPress={handleEdit}
+        >
           <Feather name="edit-2" size={20} color="white" />
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.actionButton, styles.deleteButton]} onPress={handleDelete}>
+        <TouchableOpacity
+          style={[styles.actionButton, styles.deleteButton]}
+          onPress={handleDelete}
+        >
           <Feather name="trash-2" size={20} color="white" />
         </TouchableOpacity>
       </View>
-    )
-  }
+    );
+  };
 
   // Determine priority color
   const getPriorityColor = () => {
     switch (todo.priority) {
       case "high":
-        return "#ff5252"
+        return "#ff5252";
       case "medium":
-        return "#ffa726"
+        return "#ffa726";
       case "low":
-        return "#66bb6a"
+        return "#66bb6a";
       default:
-        return "#66bb6a"
+        return "#66bb6a";
     }
-  }
+  };
 
   return (
     <Swipeable renderRightActions={renderRightActions}>
-      <View style={[styles.container, todo.completed && styles.completedContainer]}>
+      <View
+        style={[styles.container, todo.completed && styles.completedContainer]}
+      >
         <TouchableOpacity style={styles.checkbox} onPress={handleToggleStatus}>
           {todo.completed ? (
             <Feather name="check-circle" size={24} color="#2196F3" />
@@ -81,16 +92,30 @@ const TodoItem: React.FC<TodoItemProps> = memo(({ todo }) => {
 
         <View style={styles.content}>
           <View style={styles.titleRow}>
-            <Text style={[styles.title, todo.completed && styles.completedText]} numberOfLines={1}>
+            <Text
+              style={[styles.title, todo.completed && styles.completedText]}
+              numberOfLines={1}
+            >
               {todo.title}
             </Text>
-            <View style={[styles.priorityBadge, { backgroundColor: getPriorityColor() }]}>
+            <View
+              style={[
+                styles.priorityBadge,
+                { backgroundColor: getPriorityColor() },
+              ]}
+            >
               <Text style={styles.priorityText}>{todo.priority}</Text>
             </View>
           </View>
 
           {todo.description ? (
-            <Text style={[styles.description, todo.completed && styles.completedText]} numberOfLines={2}>
+            <Text
+              style={[
+                styles.description,
+                todo.completed && styles.completedText,
+              ]}
+              numberOfLines={2}
+            >
               {todo.description}
             </Text>
           ) : null}
@@ -101,7 +126,9 @@ const TodoItem: React.FC<TodoItemProps> = memo(({ todo }) => {
                 style={[
                   styles.date,
                   todo.completed && styles.completedText,
-                  new Date(todo.dueDate) < new Date() && !todo.completed && styles.overdue,
+                  new Date(todo.dueDate) < new Date() &&
+                    !todo.completed &&
+                    styles.overdue,
                 ]}
               >
                 Due: {formatDate(todo.dueDate)}
@@ -111,8 +138,8 @@ const TodoItem: React.FC<TodoItemProps> = memo(({ todo }) => {
         </View>
       </View>
     </Swipeable>
-  )
-})
+  );
+});
 
 const styles = StyleSheet.create({
   container: {
@@ -196,6 +223,6 @@ const styles = StyleSheet.create({
   deleteButton: {
     backgroundColor: "#ff5252",
   },
-})
+});
 
-export default TodoItem
+export default TodoItem;

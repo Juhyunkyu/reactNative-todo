@@ -1,10 +1,17 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { createContext, useState, useEffect, useCallback, useMemo, type ReactNode } from "react"
-import AsyncStorage from "@react-native-async-storage/async-storage"
-import * as Notifications from "expo-notifications"
-import type { Todo, TodoContextType } from "../types"
+import type React from "react";
+import {
+  createContext,
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  type ReactNode,
+} from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Notifications from "expo-notifications";
+import type { Todo, TodoContextType } from "../types";
 
 // Create context with default values
 export const TodoContext = createContext<TodoContextType>({
@@ -14,59 +21,59 @@ export const TodoContext = createContext<TodoContextType>({
   deleteTodo: async () => {},
   toggleTodoStatus: async () => {},
   loading: true,
-})
+});
 
 interface TodoProviderProps {
-  children: ReactNode
+  children: ReactNode;
 }
 
 export const TodoProvider: React.FC<TodoProviderProps> = ({ children }) => {
-  const [todos, setTodos] = useState<Todo[]>([])
-  const [loading, setLoading] = useState(true)
+  const [todos, setTodos] = useState<Todo[]>([]);
+  const [loading, setLoading] = useState(true);
 
   // Load todos from AsyncStorage on mount
   useEffect(() => {
     const loadTodos = async () => {
       try {
-        const storedTodos = await AsyncStorage.getItem("todos")
+        const storedTodos = await AsyncStorage.getItem("todos");
         if (storedTodos) {
-          setTodos(JSON.parse(storedTodos))
+          setTodos(JSON.parse(storedTodos));
         }
       } catch (error) {
-        console.error("Failed to load todos from storage", error)
+        console.error("Failed to load todos from storage", error);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    loadTodos()
-  }, [])
+    loadTodos();
+  }, []);
 
   // Save todos to AsyncStorage whenever they change
   useEffect(() => {
     const saveTodos = async () => {
       try {
         if (!loading) {
-          await AsyncStorage.setItem("todos", JSON.stringify(todos))
+          await AsyncStorage.setItem("todos", JSON.stringify(todos));
         }
       } catch (error) {
-        console.error("Failed to save todos to storage", error)
+        console.error("Failed to save todos to storage", error);
       }
-    }
+    };
 
-    saveTodos()
-  }, [todos, loading])
+    saveTodos();
+  }, [todos, loading]);
 
   // Schedule notification for a todo
   const scheduleTodoNotification = useCallback(async (todo: Todo) => {
     if (todo.dueDate) {
-      const dueDate = new Date(todo.dueDate)
-      const now = new Date()
+      const dueDate = new Date(todo.dueDate);
+      const now = new Date();
 
       // Only schedule if due date is in the future
       if (dueDate > now && !todo.completed) {
         // Cancel any existing notification for this todo
-        await Notifications.cancelScheduledNotificationAsync(todo.id)
+        await Notifications.cancelScheduledNotificationAsync(todo.id);
 
         // Schedule new notification
         await Notifications.scheduleNotificationAsync({
@@ -76,18 +83,18 @@ export const TodoProvider: React.FC<TodoProviderProps> = ({ children }) => {
             data: { todoId: todo.id },
           },
           trigger: {
-            date: dueDate
+            date: dueDate,
           },
           identifier: todo.id,
-        })
+        });
       }
     }
-  }, [])
+  }, []);
 
   // Cancel notification for a todo
   const cancelTodoNotification = useCallback(async (todoId: string) => {
-    await Notifications.cancelScheduledNotificationAsync(todoId)
-  }, [])
+    await Notifications.cancelScheduledNotificationAsync(todoId);
+  }, []);
 
   // Add a new todo
   const addTodo = useCallback(
@@ -96,32 +103,36 @@ export const TodoProvider: React.FC<TodoProviderProps> = ({ children }) => {
         ...todoData,
         id: Date.now().toString(),
         createdAt: new Date().toISOString(),
-      }
+      };
 
-      setTodos((prevTodos) => [...prevTodos, newTodo])
-      await scheduleTodoNotification(newTodo)
+      setTodos((prevTodos) => [...prevTodos, newTodo]);
+      await scheduleTodoNotification(newTodo);
     },
-    [scheduleTodoNotification],
-  )
+    [scheduleTodoNotification]
+  );
 
   // Update an existing todo
   const updateTodo = useCallback(
     async (updatedTodo: Todo) => {
-      setTodos((prevTodos) => prevTodos.map((todo) => (todo.id === updatedTodo.id ? updatedTodo : todo)))
+      setTodos((prevTodos) =>
+        prevTodos.map((todo) =>
+          todo.id === updatedTodo.id ? updatedTodo : todo
+        )
+      );
 
-      await scheduleTodoNotification(updatedTodo)
+      await scheduleTodoNotification(updatedTodo);
     },
-    [scheduleTodoNotification],
-  )
+    [scheduleTodoNotification]
+  );
 
   // Delete a todo
   const deleteTodo = useCallback(
     async (id: string) => {
-      setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== id))
-      await cancelTodoNotification(id)
+      setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== id));
+      await cancelTodoNotification(id);
     },
-    [cancelTodoNotification],
-  )
+    [cancelTodoNotification]
+  );
 
   // Toggle todo completion status
   const toggleTodoStatus = useCallback(
@@ -132,23 +143,23 @@ export const TodoProvider: React.FC<TodoProviderProps> = ({ children }) => {
             const updatedTodo = {
               ...todo,
               completed: !todo.completed,
-            }
+            };
 
             // If completed, cancel notification; otherwise reschedule
             if (updatedTodo.completed) {
-              cancelTodoNotification(id)
+              cancelTodoNotification(id);
             } else if (updatedTodo.dueDate) {
-              scheduleTodoNotification(updatedTodo)
+              scheduleTodoNotification(updatedTodo);
             }
 
-            return updatedTodo
+            return updatedTodo;
           }
-          return todo
-        }),
-      )
+          return todo;
+        })
+      );
     },
-    [cancelTodoNotification, scheduleTodoNotification],
-  )
+    [cancelTodoNotification, scheduleTodoNotification]
+  );
 
   // Memoize context value to prevent unnecessary re-renders
   const contextValue = useMemo(
@@ -160,8 +171,10 @@ export const TodoProvider: React.FC<TodoProviderProps> = ({ children }) => {
       toggleTodoStatus,
       loading,
     }),
-    [todos, addTodo, updateTodo, deleteTodo, toggleTodoStatus, loading],
-  )
+    [todos, addTodo, updateTodo, deleteTodo, toggleTodoStatus, loading]
+  );
 
-  return <TodoContext.Provider value={contextValue}>{children}</TodoContext.Provider>
-}
+  return (
+    <TodoContext.Provider value={contextValue}>{children}</TodoContext.Provider>
+  );
+};

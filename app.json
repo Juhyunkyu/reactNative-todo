@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Todo App",
+    "name": "todo-app",
     "slug": "todo-app",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -11,29 +11,24 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.yourcompany.todoapp"
+      "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      },
-      "package": "com.yourcompany.todoapp"
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      [
-        "expo-notifications",
-        {
-          "icon": "./assets/notification-icon.png",
-          "color": "#ffffff"
-        }
-      ]
-    ]
+      "expo-notifications"
+    ],
+    "newArchEnabled": true
   }
 }

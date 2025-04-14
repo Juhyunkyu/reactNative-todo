@@ -1,72 +1,83 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useContext, useMemo, useState } from "react"
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator } from "react-native"
-import { useNavigation } from "@react-navigation/native"
-import type { NativeStackNavigationProp } from "@react-navigation/native-stack"
-import { Feather } from "@expo/vector-icons"
-import { TodoContext } from "../context/TodoContext"
-import type { RootStackParamList } from "../types"
-import TodoItem from "../components/TodoItem"
-import FilterBar from "../components/FilterBar"
+import type React from "react";
+import { useContext, useMemo, useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { Feather } from "@expo/vector-icons";
+import { TodoContext } from "../context/TodoContext";
+import type { RootStackParamList } from "../types";
+import TodoItem from "../components/TodoItem";
+import FilterBar from "../components/FilterBar";
 
-type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, "Home">
-
-type FilterType = "all" | "active" | "completed"
-type SortType = "date" | "priority" | "dueDate"
+type HomeScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "Home"
+>;
 
 const HomeScreen: React.FC = () => {
-  const { todos, loading } = useContext(TodoContext)
-  const navigation = useNavigation<HomeScreenNavigationProp>()
-  const [filter, setFilter] = useState<FilterType>("all")
-  const [sortBy, setSortBy] = useState<SortType>("date")
+  const { todos, loading, toggleTodo, deleteTodo } = useContext(TodoContext);
+  const navigation = useNavigation<HomeScreenNavigationProp>();
+  const [filter, setFilter] = useState<"all" | "active" | "completed">("all");
+  const [sortBy, setSortBy] = useState<"date" | "priority">("date");
+
+  const handleToggleTodo = (id: string) => {
+    toggleTodo(id);
+  };
 
   // Memoize filtered and sorted todos to prevent unnecessary calculations
   const filteredAndSortedTodos = useMemo(() => {
     // First filter todos
-    let result = [...todos]
+    let result = [...todos];
 
     if (filter === "active") {
-      result = result.filter((todo) => !todo.completed)
+      result = result.filter((todo) => !todo.completed);
     } else if (filter === "completed") {
-      result = result.filter((todo) => todo.completed)
+      result = result.filter((todo) => todo.completed);
     }
 
     // Then sort todos
     return result.sort((a, b) => {
       if (sortBy === "date") {
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        return (
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
       } else if (sortBy === "priority") {
-        const priorityOrder = { high: 0, medium: 1, low: 2 }
-        return priorityOrder[a.priority] - priorityOrder[b.priority]
-      } else if (sortBy === "dueDate") {
-        // Handle todos without due dates
-        if (!a.dueDate && !b.dueDate) return 0
-        if (!a.dueDate) return 1
-        if (!b.dueDate) return -1
-
-        return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
+        const priorityOrder = { high: 0, medium: 1, low: 2 };
+        return priorityOrder[a.priority] - priorityOrder[b.priority];
       }
-      return 0
-    })
-  }, [todos, filter, sortBy])
+      return 0;
+    });
+  }, [todos, filter, sortBy]);
 
   const handleAddTodo = () => {
-    navigation.navigate("AddEditTodo")
-  }
+    navigation.navigate("AddEditTodo");
+  };
 
   if (loading) {
     return (
       <View style={styles.centered}>
         <ActivityIndicator size="large" color="#0000ff" />
       </View>
-    )
+    );
   }
 
   return (
     <View style={styles.container}>
-      <FilterBar filter={filter} setFilter={setFilter} sortBy={sortBy} setSortBy={setSortBy} />
+      <FilterBar
+        filter={filter}
+        setFilter={setFilter}
+        sortBy={sortBy}
+        setSortBy={setSortBy}
+      />
 
       {filteredAndSortedTodos.length > 0 ? (
         <FlatList
@@ -85,8 +96,8 @@ const HomeScreen: React.FC = () => {
         <Feather name="plus" size={24} color="white" />
       </TouchableOpacity>
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -126,6 +137,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
   },
-})
+});
 
-export default HomeScreen
+export default HomeScreen;
